@@ -1,0 +1,9 @@
+<h1>Play Game</h1>
+<input type = "text" id="gameId">
+<button onclick="startGame()">Start Game</button>
+
+<script>
+	function startGame(){
+		window.location.href = "http://localhost/startGame?game="+document.getElementById("gameId").value;
+	}
+</script>
