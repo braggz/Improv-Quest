@@ -92,12 +92,21 @@ wsServer.on('request', function(request) {
 	else if(parsedData.action == "joinGame"){
 		console.log(parsedData);
 		joinGame.joinGame(parsedData.gameId,connection).then((joinRes) => {
-			var data = {
+			console.log(joinRes);
+			if(joinRes.action != "error"){
+				var data = {
 				action:"joinedGame",
-				value:joinRes.playerId
+				value:joinRes.playerId,
+				players:joinRes.players
+				}
+				console.log(JSON.stringifydata);
+				connection.sendUTF(JSON.stringify(data));
 			}
-			console.log(JSON.stringifydata);
-			connection.sendUTF(JSON.stringify(data));
+			else{
+				console.log("what the fuck");
+				connection.sendUTF(JSON.stringify(joinRes));
+			}
+			
 		});
 	}
 }

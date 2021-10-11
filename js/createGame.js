@@ -26,7 +26,10 @@
 					players:[],
 					id:gameId,
 					activePlayers:0,
-					connections:connections
+					connections:connections,
+					host:{
+						avatart:"test"
+					}
 				}
 			//	console.log(game);
 				games.push(game);
@@ -49,13 +52,29 @@ async function searchGamesById(id){
 	})
 }
 
-async function addPlayer(index,data){
+async function addPlayer(index,player){
+	
 	return new Promise(resolve => {
-		games[index]["players"].push(data);
+		console.log(index);
+		games[index]["players"].push(player);
+		if(games[index]["activePlayers"] <= 3){
+			games[index]["activePlayers"]+=1;
+			playerJoined(games[index]["id"],player.playerId);
+			var data = {
+				success:true,
+				players:games[index]["activePlayers"]
+				
+			}
+			resolve(data);
+		}
+		else{
+			var data = {
+				success:false
+			}
+			resolve(data);
+		}
 		
-		playerJoined(games[index]["id"],data.playerId);
-		resolve(true);
-	})
+	});
 }
 
 function playerJoined(id,playerId){

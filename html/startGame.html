@@ -57,18 +57,13 @@
 	console.log(data);
 		if(data.action == "joinedGame"){
 			count+=1;
-			document.getElementById("playersJoined").innerHTML = "Players Joined: " + count + "/4";
+			document.getElementById("playersJoined").innerHTML = "Players Joined: " + data.players + "/4";
+		}
+		else if(data.action == "error"){
+			window.location.href = "http://localhost/playGame?error="+data.value;
 		}
 	}
 
-	function loop(){
-		intervalId = window.setInterval(function(){
-			var data = {
-				action:"checkStatus",
-				gameId:gameId
-			}
-			ws.send(JSON.stringify(data));
-		}, 50);	
-	}
+
 	
 </script>

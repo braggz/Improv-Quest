@@ -24,8 +24,25 @@ var con= mysql.createPool({
 				gameId:gameId,
 				playerId:playerId,
 			}
+			console.log(searchRes);
 			addPlayer.addPlayer(searchRes,player).then((addRes) => {
-				resolve(player);
+				//console.log(addRes);
+				//console.log("addRes");
+				if(addRes.success){
+					var data = {
+						player:player,
+						players:addRes.players
+					}
+					resolve(data);
+				}
+				else{
+					var data = {
+						action:"error",
+						value:"Lobby is Full"
+					}
+					resolve(data);
+				}
+				
 			})
 			
 		});
