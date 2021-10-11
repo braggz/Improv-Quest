@@ -1,50 +1,35 @@
   var path = require('path');
  var fs = require('fs');
+  var uuid = require('uuid');
  let reqPath = path.join(__dirname, './sql.json');
  let rawdata = fs.readFileSync(reqPath);
  let json = JSON.parse(rawdata);
  var mysql = require('mysql');
-
+var searchGamesById = require("./createGame.js");
+var addPlayer = require("./createGame.js");
 var con= mysql.createPool({
 	  host: json.host,
 	  user: json.user,
 	  password: json.password,
 	  database: json.database
 	});
-	
-function joinGame(gameId){
+ async function joinGame(gameId,connection){
 	return new Promise(resolve => {
-	console.log("gameid");
-	  con.query("SELECT  * FROM game WHERE gameId='"+gameId+"'" ,function (err, result) {
-	  console.log(result)
-	 if(err){
-       console.log(err);
-         var data = {
-           code:300,
-           errorMessage:"Could not insert client, please try again"
-         }
-         // resolve(false);
-     }
-	 else{
-		// resolve(gameId);
-		var player = result[0]["activePlayers"];
-				con.query("UPDATE game SET activePlayers='"+(player+1)+"' WHERE gameId='"+gameId+"'" ,function (err, result) {
-			  console.log(result)
-			 if(err){
-			   console.log(err);
-				 var data = {
-				   code:300,
-				   errorMessage:"Could not insert client, please try again"
-				 }
-				 // resolve(false);
-			 }
-			 else{
-				 
-			 }
+		searchGamesById.searchGamesById(gameId).then((searchRes) =>{
+			var playerId = uuid.v4();
+			var player = {
+				name:"name",
+				connection:connection,
+				avatarId:"test",
+				gameId:gameId,
+				playerId:playerId,
+			}
+			addPlayer.addPlayer(searchRes,player).then((addRes) => {
+				resolve(player);
 			})
-	 }
-  });
-});
+			
+		});
+	});
 }
 
 exports.joinGame = joinGame;

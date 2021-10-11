@@ -16,7 +16,7 @@ function checkStatus(gameId){
 		 return new Promise(resolve => {
 	
 	  con.query("SELECT * FROM game WHERE gameId='"+gameId+"'" ,function (err, result) {
-	  console.log(result)
+	  //console.log(result)
 	 if(err){
        console.log(err);
          var data = {

@@ -2,17 +2,19 @@ var express = require('express');
 var path = require('path');
 directHttp = express();
 var mysql = require('mysql');
+var express = require('express');
 
 var fs = require('fs');
 var programPath = path.join(__dirname, '../');
 var htmlRoot = programPath + "/html";
 let reqPath = path.join(__dirname, './sql.json');
+var dir = path.join(__dirname, '../');
 let rawdata = fs.readFileSync(reqPath);
-
+directHttp.use(express.static(dir));
 var createGame = require("./createGame.js");
 var joinGame = require("./joinGame.js");
 var checkStatus = require("./checkStatus.js");
-
+var dir = path.join(__dirname, '../i');
 let json = JSON.parse(rawdata);
 var con= mysql.createPool({
   host: json.host,
@@ -20,7 +22,7 @@ var con= mysql.createPool({
   password: json.password,
   database: json.database
 });
-
+console.log(dir);
 const http = require('http');
 const WebSocketServer = require('websocket').server;
 
@@ -67,12 +69,14 @@ wsServer.on('request', function(request) {
  function parseActions(data,connection){
 	var parsedData = JSON.parse(data);
 	if(parsedData.action == "createGame"){
-		createGame.createGame(parsedData).then((response) => {
+		createGame.createGame(parsedData,connection).then((response) => {
+			
 			var data = {
-				action:"createGame",
-				uuid:response
+				action:"gameCreated",
+				value:response.id
 			}
 			connection.sendUTF(JSON.stringify(data));
+			
 		});
 	}
 	else if(parsedData.action == "checkStatus"){
@@ -81,13 +85,23 @@ wsServer.on('request', function(request) {
 				action:"checkStatus",
 				data:response
 			}
+			
 			connection.sendUTF(JSON.stringify(data));
 		})
 	}
 	else if(parsedData.action == "joinGame"){
-		joinGame.joinGame(parsedData.gameId);
+		console.log(parsedData);
+		joinGame.joinGame(parsedData.gameId,connection).then((joinRes) => {
+			var data = {
+				action:"joinedGame",
+				value:joinRes.playerId
+			}
+			console.log(JSON.stringifydata);
+			connection.sendUTF(JSON.stringify(data));
+		});
 	}
 }
+
 
 
 

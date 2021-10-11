@@ -1,7 +1,30 @@
 <h1 style="text-align:center;" id="title"></h1>
-<h1 style="text-align:center;" id="playersJoined">Players Joined: 0</h1>
+<h1 style="text-align:center;" id="playersJoined">Players Joined: 0/4</h1>
 <button onclick="stop()" value="true">Stop</button>
+<h1 id="gameIdTitile"></h1>
 
+
+<div id= "host">
+ <img src="/img/Book1.jpg" alt="Girl in a jacket" width="200" height="200">
+ <p>Host</p>
+</div>
+<div id= "player1">
+ <img src="/img/Boy1.jpg" alt="Girl in a jacket" width="200" height="200">
+ <p>Player 1</p>
+</div>
+<div id= "player2">
+ <img src="/img/Boy1.jpg" alt="Girl in a jacket" width="200" height="200">
+ <p>Player 2</p>
+</div>
+<div id= "player3">
+ <img src="/img/Boy1.jpg" alt="Girl in a jacket" width="200" height="200">
+ <p>Player 3</p>
+</div>
+<div id= "player4">
+ <img src="/img/Boy1.jpg" alt="Girl in a jacket" width="200" height="200">
+ <p>Player 4</p>
+</div>
+   
 <script>
 	var bool = false;
 	var uuid;
@@ -26,35 +49,21 @@
 			ws.send(JSON.stringify(data));
 		};
 	ws.onmessage = function(e) {
-		console.log(JSON.parse(e.data));
-	  parseResponse(JSON.parse(e.data));
+		console.log(e.data);
+	  parseResponse(e.data);
 	};
-	function loop(){
-		intervalId = window.setInterval(function(){
-			var data = {
-				action:"checkStatus",
-				gameId:uuid
-			}
-			ws.send(JSON.stringify(data));
-		}, 50);	
-	}
+
 	
 	function parseResponse(data){
-		if(data.action == "createGame"){
-			uuid = data.uuid;
-			loop();
+		var parsed = JSON.parse(data);
+		if(parsed.action == "gameCreated"){
+			uuid = parsed.value;
+			document.getElementById("title").innerHTML = uuid;
 		}
-		else if(data.action == "checkStatus"){
-			if(data.data.activePlayers > count){
-				count = data.data.activePlayers;
-				document.getElementById("playersJoined").innerHTML = "Players Joined: "+count;
-			}
+		else if(parsed.action == "joinedGame"){
+			count++;
+			document.getElementById("playersJoined").innerHTML = "Players Joined: "+count+"/4";
 		}
 	}
-	function stop(){
-	clearInterval(intervalId) ;
-	}
-	function start(){
-	}
-	
+
 </script>

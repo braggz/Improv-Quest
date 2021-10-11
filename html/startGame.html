@@ -1,11 +1,34 @@
 <h1 style="text-align:center;" id="title"></h1>
-<h1 style="text-align:center;" id="playersJoined">Players Joined: 0</h1>
+<h1 style="text-align:center;" id="playersJoined">Players Joined: 0/4</h1>
 <button onclick="stop()" value="true">Stop</button>
 
+
+<div id= "host">
+ <img src="/img/Book1.jpg" alt="Girl in a jacket" width="200" height="200">
+ <p>Host</p>
+</div>
+<div id= "player1">
+ <img src="/img/Boy1.jpg" alt="Girl in a jacket" width="200" height="200">
+ <p>Player 1</p>
+</div>
+<div id= "player2">
+ <img src="/img/Boy1.jpg" alt="Girl in a jacket" width="200" height="200">
+ <p>Player 2</p>
+</div>
+<div id= "player3">
+ <img src="/img/Boy1.jpg" alt="Girl in a jacket" width="200" height="200">
+ <p>Player 3</p>
+</div>
+<div id= "player4">
+ <img src="/img/Boy1.jpg" alt="Girl in a jacket" width="200" height="200">
+ <p>Player 4</p>
+</div>
+ <img src="/img/Book1.jpg" alt="Girl in a jacket" width="500" height="600"> 
 <script>
 	var bool = false;
 	var uuid;
-	var intervalId
+	var intervalId;
+	var count = 0;
 	const ws = new WebSocket('ws://localhost:9898/');
 	 window.addEventListener('load', function () {
 		
@@ -31,8 +54,21 @@
 	
 	
 	function parseResponse(data){
-		console.log(data);
+	console.log(data);
+		if(data.action == "joinedGame"){
+			count+=1;
+			document.getElementById("playersJoined").innerHTML = "Players Joined: " + count + "/4";
+		}
 	}
 
+	function loop(){
+		intervalId = window.setInterval(function(){
+			var data = {
+				action:"checkStatus",
+				gameId:gameId
+			}
+			ws.send(JSON.stringify(data));
+		}, 50);	
+	}
 	
 </script>
