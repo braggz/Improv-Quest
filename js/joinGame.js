@@ -16,22 +16,28 @@ var con= mysql.createPool({
  async function joinGame(gameId,connection){
 	return new Promise(resolve => {
 		searchGamesById.searchGamesById(gameId).then((searchRes) =>{
+			console.log(gameId);
 			var playerId = uuid.v4();
+			assignId(playerId,connection);
 			var player = {
 				name:"name",
 				connection:connection,
-				avatarId:"test",
+				avatar:{
+					avatarSlotId:0,
+					avatarPicId:null,
+				},
 				gameId:gameId,
 				playerId:playerId,
 			}
-			console.log(searchRes);
+		//	console.log(searchRes);
 			addPlayer.addPlayer(searchRes,player).then((addRes) => {
 				//console.log(addRes);
-				//console.log("addRes");
+			//	console.log("addRes");
 				if(addRes.success){
 					var data = {
 						player:player,
-						players:addRes.players
+						players:addRes.players,
+						playerPicSlots:addRes.playerPicSlots
 					}
 					resolve(data);
 				}
@@ -47,6 +53,16 @@ var con= mysql.createPool({
 			
 		});
 	});
+}
+
+function assignId(id,con){
+	var assignData = {
+		action:"assignId",
+		playerId:id,
+	}
+	console.log(assignData);
+	console.log("assignId");
+	con.sendUTF(JSON.stringify(assignData));
 }
 
 exports.joinGame = joinGame;

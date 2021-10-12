@@ -7,28 +7,41 @@
  <img src="/img/Book1.jpg" alt="Girl in a jacket" width="200" height="200">
  <p>Host</p>
 </div>
-<div id= "player1">
- <img src="/img/Boy1.jpg" alt="Girl in a jacket" width="200" height="200">
- <p>Player 1</p>
+<div id= "playersPicSlots">
+	<div id="playerOneSlot" style="display:none;">
+		<img id="playerOnePic" src="/img/Boy1.jpg" alt="Girl in a jacket" width="200" height="200">
+		<div id = "butDivOne">
+		
+		</div>
+	</div>
+	<div id="playerTwoSlot" style="display:none;">
+		<img id="playerTwoPic" src="/img/Boy1.jpg" alt="Girl in a jacket" width="200" height="200">
+		<div id = "butDivTwo">
+		
+		</div>
+	</div>
+	<div id="playerThreeSlot" style="display:none;">
+		<img id="playerThreePic" src="/img/Boy1.jpg" alt="Girl in a jacket" width="200" height="200">
+		<div id = "butDivThree">
+		
+		</div>
+	</div>
+	<div id="playerFourSlot" style="display:none;">
+		<img id="playerFourPic" src="/img/Boy1.jpg" alt="Girl in a jacket" width="200" height="200">
+		<div id = "butDivFour">
+		
+		</div>
+	</div>
 </div>
-<div id= "player2">
- <img src="/img/Boy1.jpg" alt="Girl in a jacket" width="200" height="200">
- <p>Player 2</p>
-</div>
-<div id= "player3">
- <img src="/img/Boy1.jpg" alt="Girl in a jacket" width="200" height="200">
- <p>Player 3</p>
-</div>
-<div id= "player4">
- <img src="/img/Boy1.jpg" alt="Girl in a jacket" width="200" height="200">
- <p>Player 4</p>
-</div>
- <img src="/img/Book1.jpg" alt="Girl in a jacket" width="500" height="600"> 
+ <!-- <img src="/img/Book1.jpg" alt="Girl in a jacket" width="500" height="600">  -->
 <script>
 	var bool = false;
-	var uuid;
+	var playerId;
 	var intervalId;
 	var count = 0;
+	var buttonDiv;
+	var picId;
+	var divId;
 	const ws = new WebSocket('ws://localhost:9898/');
 	 window.addEventListener('load', function () {
 		
@@ -58,12 +71,106 @@
 		if(data.action == "joinedGame"){
 			count+=1;
 			document.getElementById("playersJoined").innerHTML = "Players Joined: " + data.players + "/4";
+			addPlayerPicSlot(data.playerPicSlots);
+			
 		}
 		else if(data.action == "error"){
 			window.location.href = "http://localhost/playGame?error="+data.value;
 		}
+		else if(data.action == "assignId"){
+			playerId = data.playerId;
+		}
+		else if(data.action == "updatePicture"){
+			updatePicture(data.playersPicId,data.pictureId,data.playerId);
+		}
 	}
+function addPlayerPicSlot(val){
+	for(var key in val){
+		if(val[key] != null){
+			if(key == "playerOneSlotId"){
+			console.log("here");
+				document.getElementById("playerOneSlot").style.display = "block";
+				if(val[key] == playerId){
+					picId = "playerOnePic";
+					divId = "playerOneSlot";
+					buttonDiv = "butDivOne";
+					addPlayerButtons();
+				}
+			}
+			else if(key == "playerTwoSlotId"){
+				document.getElementById("playerTwoSlot").style.display = "block";
+				if(val[key] == playerId){
+					picId = "playerTwoPic";
+					divId = "playerTwoSlot";
+					buttonDiv = "butDivTwo";
+					addPlayerButtons();
+				}
+			}
+			else if(key == "playerThreeSlotId"){
+				document.getElementById("playerThreeSlot").style.display = "block";
+				if(val[key] == playerId){
+					picId = "playerThreePic";
+					divId = "playerThreeSlot";
+					buttonDiv = "butDivThree";
+					addPlayerButtons();
+					
+				}
+			}
+			else if(key == "playerFourSlotId"){
+				document.getElementById("playerFourSlot").style.display = "block";
+				if(val[key] == playerId){
+					picId = "playerFourPic";
+					divId = "playerFourSlot";
+					buttonDiv = "butDivFour";
+					addPlayerButtons();
+				}
+			}
+		}
+		
+	}
+}
 
+ function addPlayerButtons(){
+	console.log(picId);
+	var html ="";
+	
+	html += "<button value='"+playerId+"' onclick='previous(this.value)'>Previous</button>";
+	html += "<button value='"+playerId+"' onclick='next(this.value)'>Next</button>";
+	document.getElementById(buttonDiv).innerHTML = html;
+	
+}
+
+function next(val){
+	var data = {
+		action:"nextPicture",
+		playerId:playerId,
+		gameId:gameId
+	}
+	ws.send(JSON.stringify(data));
+}
+
+function updatePicture(val,id,playerId){
+	for(var key in val){
+	
+		if(val[key] != null && val[key] == playerId ){
+		console.log(key);
+			if(key == "playerOneSlotId"){
+				document.getElementById("playerOnePic").src = "/img/"+id;
+			}
+			else if(key == "playerTwoSlotId"){
+				console.log(id);
+				document.getElementById("playerTwoPic").src = "/img/"+id;
+			}
+			else if(key == "playerThreeSlotId"){
+				document.getElementById("playerThreePic").src = "/img/"+id;
+			}
+			else if(key == "playerFourSlotId"){
+				document.getElementById("playerFourPic").src = "/img/"+id;
+			}
+		}
+		
+	}
+}
 
 	
 </script>

@@ -14,6 +14,7 @@ directHttp.use(express.static(dir));
 var createGame = require("./createGame.js");
 var joinGame = require("./joinGame.js");
 var checkStatus = require("./checkStatus.js");
+var nextPicture = require("./createGame.js");
 var dir = path.join(__dirname, '../i');
 let json = JSON.parse(rawdata);
 var con= mysql.createPool({
@@ -92,12 +93,13 @@ wsServer.on('request', function(request) {
 	else if(parsedData.action == "joinGame"){
 		console.log(parsedData);
 		joinGame.joinGame(parsedData.gameId,connection).then((joinRes) => {
-			console.log(joinRes);
+			console.log(joinRes.playerPicSlots);
 			if(joinRes.action != "error"){
 				var data = {
 				action:"joinedGame",
 				value:joinRes.playerId,
-				players:joinRes.players
+				players:joinRes.players,
+				playerPicSlots:joinRes.playerPicSlots
 				}
 				console.log(JSON.stringifydata);
 				connection.sendUTF(JSON.stringify(data));
@@ -109,7 +111,15 @@ wsServer.on('request', function(request) {
 			
 		});
 	}
+	else if(parsedData.action == "nextPicture"){
+		nextPicture.nextPicture(parsedData).then((picData) => {
+			
+		})
+	}
 }
+
+
+
 
 
 
