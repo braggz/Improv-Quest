@@ -6,6 +6,8 @@
 
 <div id= "host">
  <img id="hostPic" src="/img/Book1.jpg" alt="Girl in a jacket" width="200" height="200">
+ <button id="hostSelectPrevious" onclick="previousQuestSelect()">Previous Quest</button>
+ <button id="hostSelectNext" onclick="nextQuestSelect()">Next Quest</button>
  <p>Host</p>
 </div>
 <div id= "playersPicSlots">
@@ -69,6 +71,12 @@
 			document.getElementById("playersJoined").innerHTML = "Players Joined: "+data.players+"/4";
 			addPlayerPicSlot(parsed.playerPicSlots);
 		}
+		else if(parsed.action == "updatePicture"){
+			updatePicture(parsed.playersPicId,parsed.pictureId,parsed.playerId);
+		}
+		else if(parsed.action == "updateQuest"){
+			updateQuest(parsed.pictureId);
+		}
 	}
 	
 	function addPlayerPicSlot(val){
@@ -89,4 +97,49 @@
 			}
 		}
 	}
+	
+	function updatePicture(val,id,playerId){
+	
+	for(var key in val){
+	
+		if(val[key] != null && val[key] == playerId ){
+		console.log("here");
+		console.log(key);
+			if(key == "playerOneSlotId"){
+				document.getElementById("playerOnePic").src = "/img/"+id;
+			}
+			else if(key == "playerTwoSlotId"){
+				console.log(id);
+				document.getElementById("playerTwoPic").src = "/img/"+id;
+			}
+			else if(key == "playerThreeSlotId"){
+				document.getElementById("playerThreePic").src = "/img/"+id;
+			}
+			else if(key == "playerFourSlotId"){
+				document.getElementById("playerFourPic").src = "/img/"+id;
+			}
+		}
+		
+	}
+}
+
+function updateQuest(id){
+	document.getElementById("hostPic").src = "/img/"+id;
+}
+
+function nextQuestSelect(){
+	var data = {
+		action:"nextQuest",
+		gameId:uuid
+	}
+	ws.send(JSON.stringify(data));
+}
+
+function previousQuestSelect(){
+	var data = {
+		action:"previousQuest",
+		gameId:uuid
+	}
+	ws.send(JSON.stringify(data));
+}
 </script>

@@ -27,6 +27,7 @@
 					id:gameId,
 					activePlayers:0,
 					connections:connections,
+					selectedQuest:0,
 					host:{
 						avatart:"test"
 					},
@@ -147,24 +148,12 @@ function nextPicture(json){
 			games[searchData]["players"][playerData]["avatar"]["avatarSlotId"] += 1;
 			var temp = games[searchData]["players"][playerData]["avatar"]["avatarSlotId"];
 			var picId;
-			if(temp == 0){
-				picId = "Boy1.jpg";
+			if(temp > 5){
+				temp = 0;
+				games[searchData]["players"][playerData]["avatar"]["avatarSlotId"] = 0;
 			}
-			else if(temp == 1){
-				picId = "Boy2.jpg";
-			}
-			else if(temp == 2){
-				picId = "Boy1_0.jpg";
-			}
-			else if(temp == 3){
-				picId = "Girl1_0.jpg";
-			}
-			else if(temp == 4){
-				picId = "Girl1.jpg";
-			}
-			else if(temp == 5){
-				picId = "Girl2.jpg";
-			}
+			picId = getPlayerPicId(temp);
+			
 			var data = {
 				action:"updatePicture",
 				playerId:json.playerId,
@@ -177,6 +166,129 @@ function nextPicture(json){
 	})
 	})
 }
+function getPlayerPicId(temp){
+	if(temp == 0){
+				return "Boy1.jpg";
+			}
+			else if(temp == 1){
+				return "Boy2.jpg";
+			}
+			else if(temp == 2){
+				return "Boy1_0.jpg";
+			}
+			else if(temp == 3){
+				return "Girl1_0.jpg";
+			}
+			else if(temp == 4){
+				return "Girl1.jpg";
+			}
+			else if(temp == 5){
+				return "Girl2.jpg";
+			}
+			else{
+				return null;
+			}
+}
+
+function previousPicture(json){
+	return new Promise(resolve => {
+	console.log("here4");
+	searchGamesById(json.gameId).then((searchData) => {
+		console.log("here5");
+		searchPlayerId(json.playerId,searchData).then((playerData) =>{
+			games[searchData]["players"][playerData]["avatar"]["avatarSlotId"] -= 1;
+			var temp = games[searchData]["players"][playerData]["avatar"]["avatarSlotId"];
+			var picId;
+			if(temp < 0){
+				temp = 5;
+				games[searchData]["players"][playerData]["avatar"]["avatarSlotId"] = 5;
+			}
+			picId = getPlayerPicId(temp);
+			
+			var data = {
+				action:"updatePicture",
+				playerId:json.playerId,
+				pictureId:picId,
+				playersPicId:games[searchData]["playerSlots"]
+			}
+			console.log(data);
+			massSend(json.gameId,data,searchData);
+		})
+	})
+	})
+}
+function findHostPictureId(temp){
+	if(temp == 0){
+				return "Book1.jpg";
+			}
+			else if(temp == 1){
+				return "Book2.jpg";
+			}
+			else if(temp == 2){
+				return "Book3.jpg";
+			}
+			else if(temp == 3){
+				return "Book4.jpg";
+			}
+			else{
+				return null;	
+			}
+			
+}
+
+function nextQuest(json){
+	return new Promise(resolve => {
+	console.log("here4");
+	searchGamesById(json.gameId).then((searchData) => {
+		console.log("here5");
+		
+			games[searchData]["selectedQuest"] += 1;
+			var temp = games[searchData]["selectedQuest"];
+			console.log(temp);
+			var picId;
+			if(temp > 3){
+				temp = 0;
+				games[searchData]["selectedQuest"] = 0;
+			}
+			picId = findHostPictureId(temp);
+			console.log(picId);
+			var data = {
+				action:"updateQuest",
+				pictureId:picId,
+			}
+			console.log(data);
+			massSend(json.gameId,data,searchData);
+		
+	})
+	})
+}
+
+function previousQuest(json){
+	return new Promise(resolve => {
+	console.log("here4");
+	searchGamesById(json.gameId).then((searchData) => {
+		console.log("here5");
+		
+			games[searchData]["selectedQuest"] -= 1;
+			var temp = games[searchData]["selectedQuest"];
+			console.log(temp);
+			var picId;
+			if(temp < 0){
+				temp = 3;
+				games[searchData]["selectedQuest"] = 3;
+			}
+			picId = findHostPictureId(temp);
+			console.log(picId);
+			var data = {
+				action:"updateQuest",
+				pictureId:picId,
+			}
+			console.log(data);
+			massSend(json.gameId,data,searchData);
+		
+	})
+	})
+}
 
 function massSend(gameId,data,index){
 	for(var i =0; i < games[index]["connections"].length;i++){
@@ -185,7 +297,48 @@ function massSend(gameId,data,index){
 		con.sendUTF(JSON.stringify(data));
 	}
 }
+
+function syncGame(gameId,con){
+	searchGamesById(gameId).then((gameId) => {
+		playerSlots = games[gameId]["playerSlots"];
+		syncPlayerSlots(gameId).then((slotData) => {
+			var hostPic = findHostPictureId(games[gameId]["selectedQuest"]);
+			
+			var syncData = {
+				action:"syncGame",
+				playerSlots:playerSlots,
+				playerData:slotData,
+				hostData:hostPic
+			}
+			
+			con.sendUTF(JSON.stringify(syncData));
+		})
+	})	
+}
+
+function syncPlayerSlots(gameId){
+	return new Promise(resolve => {
+		var players = games[gameId]["players"];
+		var picSyncDataArr = [];
+		for(var i =0; i < players.length; i++){
+			var pic = getPlayerPicId(players[i]["avatar"]["avatarSlotId"]);
+			var playerId = players[i]["playerId"];
+			var picSyncData = {
+				playerId:playerId,
+				picId:pic
+			}
+			picSyncDataArr.push(picSyncData);
+			
+		}
+		resolve(picSyncDataArr);
+	})
+}
+
 exports.createGame = createGame;
 exports.searchGamesById = searchGamesById;
 exports.addPlayer = addPlayer;
 exports.nextPicture = nextPicture;
+exports.previousPicture = previousPicture;
+exports.nextQuest = nextQuest;
+exports.previousQuest = previousQuest;
+exports.syncGame = syncGame;

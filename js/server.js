@@ -15,6 +15,10 @@ var createGame = require("./createGame.js");
 var joinGame = require("./joinGame.js");
 var checkStatus = require("./checkStatus.js");
 var nextPicture = require("./createGame.js");
+var previousPicture = require("./createGame.js");
+var nextQuest = require("./createGame.js");
+var previousQuest = require("./createGame.js");
+var syncGame = require("./createGame.js");
 var dir = path.join(__dirname, '../i');
 let json = JSON.parse(rawdata);
 var con= mysql.createPool({
@@ -110,11 +114,20 @@ wsServer.on('request', function(request) {
 			}
 			
 		});
+		syncGame.syncGame(parsedData.gameId,connection);
+		
 	}
 	else if(parsedData.action == "nextPicture"){
-		nextPicture.nextPicture(parsedData).then((picData) => {
-			
-		})
+		nextPicture.nextPicture(parsedData);
+	}
+	else if(parsedData.action == "previousPicture"){
+		previousPicture.previousPicture(parsedData);
+	}
+	else if(parsedData.action == "nextQuest"){
+		nextQuest.nextQuest(parsedData);
+	}
+	else if(parsedData.action == "previousQuest"){
+		previousQuest.previousQuest(parsedData);
 	}
 }
 
