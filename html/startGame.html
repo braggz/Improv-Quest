@@ -2,6 +2,8 @@
 <h1 style="text-align:center;" id="playersJoined">Players Joined: 0/4</h1>
 <button onclick="stop()" value="true">Stop</button>
 
+<h1 id="questTitle"></h1>
+<p id="questDesc"></p>
 
 <div id= "host">
  <img src="/img/Book1.jpg" id="hostPic" alt="Girl in a jacket" width="200" height="200">
@@ -61,7 +63,7 @@
 			ws.send(JSON.stringify(data));
 		};
 	ws.onmessage = function(e) {
-		console.log(e.data);
+		//console.log(e.data);
 	  parseResponse(JSON.parse(e.data));
 	};
 	
@@ -70,7 +72,7 @@
 	console.log(data);
 		if(data.action == "joinedGame"){
 			count+=1;
-			document.getElementById("playersJoined").innerHTML = "Players Joined: " + data.players + "/4";
+			document.getElementById("playersJoined").innerHTML = "Players Joined: " + data.playerCount + "/4";
 			addPlayerPicSlot(data.playerPicSlots);
 			
 		}
@@ -88,6 +90,7 @@
 		}
 		else if(data.action == "syncGame"){
 			syncGame(data);
+			
 		}
 	}
 function addPlayerPicSlot(val){
@@ -137,7 +140,7 @@ function addPlayerPicSlot(val){
 }
 
  function addPlayerButtons(){
-	console.log(picId);
+	
 	var html ="";
 	
 	html += "<button value='"+playerId+"' onclick='previous(this.value)'>Previous</button>";
@@ -169,12 +172,12 @@ function updatePicture(val,id,playerId){
 	for(var key in val){
 	
 		if(val[key] != null && val[key] == playerId ){
-		console.log(key);
+
 			if(key == "playerOneSlotId"){
 				document.getElementById("playerOnePic").src = "/img/"+id;
 			}
 			else if(key == "playerTwoSlotId"){
-				console.log(id);
+				
 				document.getElementById("playerTwoPic").src = "/img/"+id;
 			}
 			else if(key == "playerThreeSlotId"){
@@ -187,8 +190,12 @@ function updatePicture(val,id,playerId){
 		
 	}
 }
-function updateQuest(id){
-	document.getElementById("hostPic").src = "/img/"+id;
+function updateQuest(updateData){
+	console.log(updateData);
+	console.log("This is data")
+	document.getElementById("hostPic").src = "/img/"+updateData.picId;
+	document.getElementById("questTitle").innerHTML=updateData.title;
+	document.getElementById("questDesc").innerHTML=updateData.desc;
 }
 
 function syncGame(data){

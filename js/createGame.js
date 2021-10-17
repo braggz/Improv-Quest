@@ -1,11 +1,12 @@
  var path = require('path');
  var fs = require('fs');
  let reqPath = path.join(__dirname, './sql.json');
+ let questPath = path.join(__dirname, '../questData/quests.json');
  let rawdata = fs.readFileSync(reqPath);
  let json = JSON.parse(rawdata);
  var mysql = require('mysql');
  var uuid = require('uuid');
- 
+
  var games = [];
 	var con= mysql.createPool({
 	  host: json.host,
@@ -39,6 +40,7 @@
 					},
 				}
 			//	console.log(game);
+				
 				games.push(game);
 			//	console.log(games);
 				resolve(game);
@@ -250,8 +252,11 @@ function nextQuest(json){
 				temp = 0;
 				games[searchData]["selectedQuest"] = 0;
 			}
-			picId = findHostPictureId(temp);
-			console.log(picId);
+			//var hostPic = games[gameId]["selectedQuest"];
+			let questPath = path.join(__dirname, '../questData/quests.json');
+			var obj1 = fs.readFileSync(questPath, 'utf8');
+			var obj = JSON.parse(obj1);
+			picId = obj[temp];
 			var data = {
 				action:"updateQuest",
 				pictureId:picId,
@@ -277,7 +282,11 @@ function previousQuest(json){
 				temp = 3;
 				games[searchData]["selectedQuest"] = 3;
 			}
-			picId = findHostPictureId(temp);
+			//var hostPic = games[gameId]["selectedQuest"];
+			let questPath = path.join(__dirname, '../questData/quests.json');
+			var obj1 = fs.readFileSync(questPath, 'utf8');
+			var obj = JSON.parse(obj1);
+			picId = obj[temp];
 			console.log(picId);
 			var data = {
 				action:"updateQuest",
@@ -298,19 +307,24 @@ function massSend(gameId,data,index){
 	}
 }
 
-function syncGame(gameId,con){
+async function syncGame(gameId,con){
 	searchGamesById(gameId).then((gameId) => {
 		playerSlots = games[gameId]["playerSlots"];
 		syncPlayerSlots(gameId).then((slotData) => {
-			var hostPic = findHostPictureId(games[gameId]["selectedQuest"]);
+			var hostPic = games[gameId]["selectedQuest"];
+			let questPath = path.join(__dirname, '../questData/quests.json');
+			var obj1 = fs.readFileSync(questPath, 'utf8');
+			var obj = JSON.parse(obj1);
+			console.log(obj[hostPic]);
 			
 			var syncData = {
 				action:"syncGame",
 				playerSlots:playerSlots,
 				playerData:slotData,
-				hostData:hostPic
+				hostData:obj[hostPic]
 			}
-			
+			console.log(syncData);
+			console.log("This is sync data");
 			con.sendUTF(JSON.stringify(syncData));
 		})
 	})	

@@ -2,7 +2,8 @@
 <h1 style="text-align:center;" id="playersJoined">Players Joined: 0/4</h1>
 <button onclick="stop()" value="true">Stop</button>
 <h1 id="gameIdTitile"></h1>
-
+<h1 id="questTitle"></h1>
+<p id="questDesc"></p>
 
 <div id= "host">
  <img id="hostPic" src="/img/Book1.jpg" alt="Girl in a jacket" width="200" height="200">
@@ -55,20 +56,23 @@
 			ws.send(JSON.stringify(data));
 		};
 	ws.onmessage = function(e) {
-		console.log(e.data);
+		//console.log(e.data);
 	  parseResponse(e.data);
 	};
 
 	
 	function parseResponse(data){
 		var parsed = JSON.parse(data);
+		console.log(parsed);
 		if(parsed.action == "gameCreated"){
 			uuid = parsed.value;
 			document.getElementById("title").innerHTML = uuid;
+			//console.log(data)
+			updateQuest(parsed.hostData);
 		}
 		else if(parsed.action == "joinedGame"){
 			count++;
-			document.getElementById("playersJoined").innerHTML = "Players Joined: "+data.players+"/4";
+			document.getElementById("playersJoined").innerHTML = "Players Joined: "+parsed.playerCount+"/4";
 			addPlayerPicSlot(parsed.playerPicSlots);
 		}
 		else if(parsed.action == "updatePicture"){
@@ -123,8 +127,10 @@
 	}
 }
 
-function updateQuest(id){
-	document.getElementById("hostPic").src = "/img/"+id;
+function updateQuest(data){
+	document.getElementById("hostPic").src = "/img/"+data.picId;
+	document.getElementById("questTitle").innerHTML=data.title;
+	document.getElementById("questDesc").innerHTML=data.desc;
 }
 
 function nextQuestSelect(){

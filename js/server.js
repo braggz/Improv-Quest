@@ -69,16 +69,20 @@ wsServer.on('request', function(request) {
         console.log('Client has disconnected.');
     });
 });
-
-
+ 
+  
  function parseActions(data,connection){
 	var parsedData = JSON.parse(data);
 	if(parsedData.action == "createGame"){
 		createGame.createGame(parsedData,connection).then((response) => {
+			let questPath = path.join(__dirname, '../questData/quests.json');
+			var obj1 = fs.readFileSync(questPath, 'utf8');
+			var obj = JSON.parse(obj1);
 			
 			var data = {
 				action:"gameCreated",
-				value:response.id
+				value:response.id,
+				hostData:obj[response.selectedQuest]
 			}
 			connection.sendUTF(JSON.stringify(data));
 			
@@ -102,7 +106,7 @@ wsServer.on('request', function(request) {
 				var data = {
 				action:"joinedGame",
 				value:joinRes.playerId,
-				players:joinRes.players,
+				playerCount:joinRes.players,
 				playerPicSlots:joinRes.playerPicSlots
 				}
 				console.log(JSON.stringifydata);
