@@ -70,8 +70,8 @@ wsServer.on('request', function(request) {
         console.log('Client has disconnected.');
     });
 });
- 
-  
+
+
  function parseActions(data,connection){
 	var parsedData = JSON.parse(data);
 	if(parsedData.action == "createGame"){
@@ -79,14 +79,14 @@ wsServer.on('request', function(request) {
 			let questPath = path.join(__dirname, '../questData/quests.json');
 			var obj1 = fs.readFileSync(questPath, 'utf8');
 			var obj = JSON.parse(obj1);
-			
+
 			var data = {
 				action:"gameCreated",
 				value:response.id,
 				hostData:obj[response.selectedQuest]
 			}
 			connection.sendUTF(JSON.stringify(data));
-			
+
 		});
 	}
 	else if(parsedData.action == "checkStatus"){
@@ -95,7 +95,7 @@ wsServer.on('request', function(request) {
 				action:"checkStatus",
 				data:response
 			}
-			
+
 			connection.sendUTF(JSON.stringify(data));
 		})
 	}
@@ -117,10 +117,11 @@ wsServer.on('request', function(request) {
 				console.log("what the fuck");
 				connection.sendUTF(JSON.stringify(joinRes));
 			}
-			
+
 		});
+    console.log("Attempted to Sync Game");
 		syncGame.syncGame(parsedData.gameId,connection);
-		
+
 	}
 	else if(parsedData.action == "nextPicture"){
 		nextPicture.nextPicture(parsedData,connection);
@@ -138,12 +139,3 @@ wsServer.on('request', function(request) {
 		lockCharacter.lockCharacter(parsedData);
 	}
 }
-
-
-
-
-
-
-
-
-

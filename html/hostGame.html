@@ -25,23 +25,23 @@
 		<img id="playerFourPic" src="/img/Boy1.jpg" alt="Girl in a jacket" width="200" height="200" style="display:none;">
 	</div>
 </div>
-   
+
 <script>
 	var bool = false;
 	var uuid;
 	var intervalId;
 	var count = 0;
-	
+
 	var playerOneId;
 	var playerTwoId;
 	var playerThreeId;
 	var playerFourId;
-	
+
 	const ws = new WebSocket('ws://localhost:9898/');
 	 window.addEventListener('load', function () {
-		
-	
-		
+
+
+
 	});
 	const queryString = window.location.search;
 		const urlParams = new URLSearchParams(queryString);
@@ -60,7 +60,7 @@
 	  parseResponse(e.data);
 	};
 
-	
+
 	function parseResponse(data){
 		var parsed = JSON.parse(data);
 		console.log(parsed);
@@ -81,8 +81,12 @@
 		else if(parsed.action == "updateQuest"){
 			updateQuest(parsed.pictureId);
 		}
+    else if(parsed.action == "lockedCharacter"){
+      console.log("Iam a ham")
+			lockedCharacter(parsed);
+		}
 	}
-	
+
 	function addPlayerPicSlot(val){
 		for(var key in val){
 			if(val[key] != null){
@@ -101,11 +105,11 @@
 			}
 		}
 	}
-	
+
 	function updatePicture(val,id,playerId){
-	
+
 	for(var key in val){
-	
+
 		if(val[key] != null && val[key] == playerId ){
 		console.log("here");
 		console.log(key);
@@ -123,7 +127,7 @@
 				document.getElementById("playerFourPic").src = "/img/"+id;
 			}
 		}
-		
+
 	}
 }
 
@@ -147,5 +151,10 @@ function previousQuestSelect(){
 		gameId:uuid
 	}
 	ws.send(JSON.stringify(data));
+}
+function lockedCharacter(data){
+	console.log(data);
+	console.log("pls lock")
+	updatePicture(data.playersPicId,data.pictureId.lockedPicId,data.playerId);
 }
 </script>

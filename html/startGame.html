@@ -13,25 +13,25 @@
 	<div id="playerOneSlot" style="display:none;">
 		<img id="playerOnePic" src="/img/Boy1.jpg" alt="Girl in a jacket" width="200" height="200">
 		<div id = "butDivOne">
-		
+
 		</div>
 	</div>
 	<div id="playerTwoSlot" style="display:none;">
 		<img id="playerTwoPic" src="/img/Boy1.jpg" alt="Girl in a jacket" width="200" height="200">
 		<div id = "butDivTwo">
-		
+
 		</div>
 	</div>
 	<div id="playerThreeSlot" style="display:none;">
 		<img id="playerThreePic" src="/img/Boy1.jpg" alt="Girl in a jacket" width="200" height="200">
 		<div id = "butDivThree">
-		
+
 		</div>
 	</div>
 	<div id="playerFourSlot" style="display:none;">
 		<img id="playerFourPic" src="/img/Boy1.jpg" alt="Girl in a jacket" width="200" height="200">
 		<div id = "butDivFour">
-		
+
 		</div>
 	</div>
 </div>
@@ -46,14 +46,14 @@
 	var divId;
 	const ws = new WebSocket('ws://localhost:9898/');
 	 window.addEventListener('load', function () {
-		
-	
-		
+
+
+
 	});
 	const queryString = window.location.search;
 		const urlParams = new URLSearchParams(queryString);
 		var gameId = urlParams.get('game');
-		
+
 		var data = {
 		action:"joinGame",
 		gameId:gameId
@@ -66,15 +66,15 @@
 		//console.log(e.data);
 	  parseResponse(JSON.parse(e.data));
 	};
-	
-	
+
+
 	function parseResponse(data){
 	console.log(data);
 		if(data.action == "joinedGame"){
 			count+=1;
 			document.getElementById("playersJoined").innerHTML = "Players Joined: " + data.playerCount + "/4";
 			addPlayerPicSlot(data.playerPicSlots);
-			
+
 		}
 		else if(data.action == "error"){
 			window.location.href = "http://localhost/playGame?error="+data.value;
@@ -92,11 +92,14 @@
 			updateQuest(data.pictureId);
 		}
 		else if(data.action == "syncGame"){
-			syncGame(data);			
+			syncGame(data);
 		}
 		else if(data.action == "lockedCharacter"){
-			lockedCharacter(data);			
+			lockedCharacter(data);
 		}
+    else if(data.action == "characterIsLocked"){
+      alert("That character has been chosen. Please choose another.")
+    }
 	}
 function addPlayerPicSlot(val){
 	for(var key in val){
@@ -127,7 +130,7 @@ function addPlayerPicSlot(val){
 					divId = "playerThreeSlot";
 					buttonDiv = "butDivThree";
 					addPlayerButtons();
-					
+
 				}
 			}
 			else if(key == "playerFourSlotId"){
@@ -140,19 +143,19 @@ function addPlayerPicSlot(val){
 				}
 			}
 		}
-		
+
 	}
 }
 
  function addPlayerButtons(){
-	
+
 	var html ="";
-	
+
 	html += "<button value='"+playerId+"' onclick='previous(this.value)'>Previous</button>";
 	html += "<button value='"+playerId+"' onclick='next(this.value)'>Next</button>";
 	html += "<button value='"+playerId+"' onclick='lockCharacter(this.value)'>Choose Character</button>";
 	document.getElementById(buttonDiv).innerHTML = html;
-	
+
 }
 
 function next(val){
@@ -176,14 +179,14 @@ function previous(val){
 function updatePicture(val,id,playerId){
 
 	for(var key in val){
-	
+
 		if(val[key] != null && val[key] == playerId ){
 
 			if(key == "playerOneSlotId"){
 				document.getElementById("playerOnePic").src = "/img/"+id;
 			}
 			else if(key == "playerTwoSlotId"){
-				
+
 				document.getElementById("playerTwoPic").src = "/img/"+id;
 			}
 			else if(key == "playerThreeSlotId"){
@@ -193,7 +196,7 @@ function updatePicture(val,id,playerId){
 				document.getElementById("playerFourPic").src = "/img/"+id;
 			}
 		}
-		
+
 	}
 }
 function updateQuest(updateData){
@@ -232,5 +235,5 @@ function lockedCharacter(data){
 	//updatePicture(val,id,playerId)
 	updatePicture(data.playersPicId,data.pictureId.lockedPicId,data.playerId);
 }
-	
+
 </script>

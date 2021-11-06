@@ -19,6 +19,8 @@ var con= mysql.createPool({
 			console.log(gameId);
 			var playerId = uuid.v4();
 			assignId(playerId,connection);
+      
+
 			var player = {
 				name:"name",
 				connection:connection,
@@ -49,9 +51,9 @@ var con= mysql.createPool({
 					}
 					resolve(data);
 				}
-				
+
 			})
-			
+
 		});
 	});
 }
