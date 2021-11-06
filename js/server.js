@@ -19,6 +19,7 @@ var previousPicture = require("./createGame.js");
 var nextQuest = require("./createGame.js");
 var previousQuest = require("./createGame.js");
 var syncGame = require("./createGame.js");
+var lockCharacter = require("./createGame.js");
 var dir = path.join(__dirname, '../i');
 let json = JSON.parse(rawdata);
 var con= mysql.createPool({
@@ -122,16 +123,19 @@ wsServer.on('request', function(request) {
 		
 	}
 	else if(parsedData.action == "nextPicture"){
-		nextPicture.nextPicture(parsedData);
+		nextPicture.nextPicture(parsedData,connection);
 	}
 	else if(parsedData.action == "previousPicture"){
-		previousPicture.previousPicture(parsedData);
+		previousPicture.previousPicture(parsedData,connection);
 	}
 	else if(parsedData.action == "nextQuest"){
 		nextQuest.nextQuest(parsedData);
 	}
 	else if(parsedData.action == "previousQuest"){
 		previousQuest.previousQuest(parsedData);
+	}
+	else if(parsedData.action == "lockCharacter"){
+		lockCharacter.lockCharacter(parsedData);
 	}
 }
 

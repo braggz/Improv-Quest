@@ -1,7 +1,7 @@
 <h1 style="text-align:center;" id="title"></h1>
 <h1 style="text-align:center;" id="playersJoined">Players Joined: 0/4</h1>
 <button onclick="stop()" value="true">Stop</button>
-
+<p style="color:red;" id="error"></p>
 <h1 id="questTitle"></h1>
 <p id="questDesc"></p>
 
@@ -79,18 +79,23 @@
 		else if(data.action == "error"){
 			window.location.href = "http://localhost/playGame?error="+data.value;
 		}
+		else if(data.action == "ierror"){
+			document.getElementById("error").innerHTML = data.message;
+		}
 		else if(data.action == "assignId"){
 			playerId = data.playerId;
 		}
 		else if(data.action == "updatePicture"){
-			updatePicture(data.playersPicId,data.pictureId,data.playerId);
+			updatePicture(data.playersPicId,data.pictureId.picId,data.playerId);
 		}
 		else if(data.action == "updateQuest"){
 			updateQuest(data.pictureId);
 		}
 		else if(data.action == "syncGame"){
-			syncGame(data);
-			
+			syncGame(data);			
+		}
+		else if(data.action == "lockedCharacter"){
+			lockedCharacter(data);			
 		}
 	}
 function addPlayerPicSlot(val){
@@ -145,6 +150,7 @@ function addPlayerPicSlot(val){
 	
 	html += "<button value='"+playerId+"' onclick='previous(this.value)'>Previous</button>";
 	html += "<button value='"+playerId+"' onclick='next(this.value)'>Next</button>";
+	html += "<button value='"+playerId+"' onclick='lockCharacter(this.value)'>Choose Character</button>";
 	document.getElementById(buttonDiv).innerHTML = html;
 	
 }
@@ -200,9 +206,31 @@ function updateQuest(updateData){
 
 function syncGame(data){
 	for(var i =0; i < data.playerData.length; i++){
-		updatePicture(data.playerSlots,data.playerData[i]["picId"],data.playerData[i]["playerId"]);
+		//console.log(playerData);
+		if(data.playerDataFull[i]["avatar"]["locked"] == false){
+			updatePicture(data.playerSlots,data.playerData[i]["picId"]["picId"],data.playerData[i]["playerId"]);
+		}
+		else{
+			updatePicture(data.playerSlots,data.playerData[i]["picId"]["lockedPicId"],data.playerData[i]["playerId"])
+		}
 	}
 	updateQuest(data.hostData);
+}
+
+function lockCharacter(val){
+	var data = {
+		action:"lockCharacter",
+		playerId:playerId,
+		gameId:gameId
+	}
+	ws.send(JSON.stringify(data));
+
+}
+
+function lockedCharacter(data){
+	console.log(data);
+	//updatePicture(val,id,playerId)
+	updatePicture(data.playersPicId,data.pictureId.lockedPicId,data.playerId);
 }
 	
 </script>

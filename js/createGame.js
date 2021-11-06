@@ -141,103 +141,105 @@ function pickPicSlot(index,playerId,player){
 	}
 }
 
-function nextPicture(json){
+function nextPicture(json,con){
 	return new Promise(resolve => {
 	console.log("here4");
 	searchGamesById(json.gameId).then((searchData) => {
 		console.log("here5");
 		searchPlayerId(json.playerId,searchData).then((playerData) =>{
-			games[searchData]["players"][playerData]["avatar"]["avatarSlotId"] += 1;
-			var temp = games[searchData]["players"][playerData]["avatar"]["avatarSlotId"];
-			var picId;
-			if(temp > 5){
-				temp = 0;
-				games[searchData]["players"][playerData]["avatar"]["avatarSlotId"] = 0;
+			if(games[searchData]["players"][playerData]["avatar"]["locked"] == false){
+				games[searchData]["players"][playerData]["avatar"]["avatarSlotId"] += 1;
+				var temp = games[searchData]["players"][playerData]["avatar"]["avatarSlotId"];
+				var picId;
+				if(temp > 5){
+					temp = 0;
+					games[searchData]["players"][playerData]["avatar"]["avatarSlotId"] = 0;
+				}
+				let questPath = path.join(__dirname, '../questData/players.json');
+				var obj1 = fs.readFileSync(questPath, 'utf8');
+				var obj = JSON.parse(obj1);
+				picId = obj[temp];
+				
+				var data = {
+					action:"updatePicture",
+					playerId:json.playerId,
+					pictureId:picId,
+					playersPicId:games[searchData]["playerSlots"]
+				}
+				console.log(data);
+				massSend(json.gameId,data,searchData);
 			}
-			picId = getPlayerPicId(temp);
-			
-			var data = {
-				action:"updatePicture",
-				playerId:json.playerId,
-				pictureId:picId,
-				playersPicId:games[searchData]["playerSlots"]
+			else{
+				var data = {
+					action:"ierror",
+					message:"You are Locked Bro"
+				}
+				con.sendUTF(JSON.stringify(data));
 			}
-			console.log(data);
-			massSend(json.gameId,data,searchData);
 		})
 	})
 	})
 }
-function getPlayerPicId(temp){
-	if(temp == 0){
-				return "Boy1.jpg";
-			}
-			else if(temp == 1){
-				return "Boy2.jpg";
-			}
-			else if(temp == 2){
-				return "Boy1_0.jpg";
-			}
-			else if(temp == 3){
-				return "Girl1_0.jpg";
-			}
-			else if(temp == 4){
-				return "Girl1.jpg";
-			}
-			else if(temp == 5){
-				return "Girl2.jpg";
-			}
-			else{
-				return null;
-			}
-}
 
-function previousPicture(json){
+
+function previousPicture(json,con){
 	return new Promise(resolve => {
 	console.log("here4");
 	searchGamesById(json.gameId).then((searchData) => {
+		
 		console.log("here5");
 		searchPlayerId(json.playerId,searchData).then((playerData) =>{
-			games[searchData]["players"][playerData]["avatar"]["avatarSlotId"] -= 1;
-			var temp = games[searchData]["players"][playerData]["avatar"]["avatarSlotId"];
-			var picId;
-			if(temp < 0){
-				temp = 5;
-				games[searchData]["players"][playerData]["avatar"]["avatarSlotId"] = 5;
+			if(games[searchData]["players"][playerData]["avatar"]["locked"] == false){
+				games[searchData]["players"][playerData]["avatar"]["avatarSlotId"] -= 1;
+				var temp = games[searchData]["players"][playerData]["avatar"]["avatarSlotId"];
+				var picId;
+				if(temp < 0){
+					temp = 5;
+					games[searchData]["players"][playerData]["avatar"]["avatarSlotId"] = 5;
+				}
+				let questPath = path.join(__dirname, '../questData/players.json');
+				var obj1 = fs.readFileSync(questPath, 'utf8');
+				var obj = JSON.parse(obj1);
+				picId = obj[temp];
+				
+				//
+				//var locked = 
+				var data = {
+					action:"updatePicture",
+					playerId:json.playerId,
+					pictureId:picId,
+					playersPicId:games[searchData]["playerSlots"],
+					
+				}
+				console.log(data);
+				massSend(json.gameId,data,searchData);
 			}
-			picId = getPlayerPicId(temp);
-			
-			var data = {
-				action:"updatePicture",
-				playerId:json.playerId,
-				pictureId:picId,
-				playersPicId:games[searchData]["playerSlots"]
+			else{
+				var data = {
+					action:"ierror",
+					message:"You are Locked Bro"
+				}
+				con.sendUTF(JSON.stringify(data));
 			}
-			console.log(data);
-			massSend(json.gameId,data,searchData);
 		})
 	})
 	})
 }
-function findHostPictureId(temp){
-	if(temp == 0){
-				return "Book1.jpg";
-			}
-			else if(temp == 1){
-				return "Book2.jpg";
-			}
-			else if(temp == 2){
-				return "Book3.jpg";
-			}
-			else if(temp == 3){
-				return "Book4.jpg";
-			}
-			else{
-				return null;	
+function searchLockedSlots(gameId,picId){
+	return new Promise(resolve => {
+		for(var i=0;i<games[gameId]["players"].length;i++){
+			player = games[gameId]["players"][i];
+			if(player.avatar.locked == true){
+				resolve(true);
 			}
 			
+				
+		
+		}
+		resolve(false);
+	});
+	
 }
-
 function nextQuest(json){
 	return new Promise(resolve => {
 	console.log("here4");
@@ -316,12 +318,18 @@ async function syncGame(gameId,con){
 			var obj1 = fs.readFileSync(questPath, 'utf8');
 			var obj = JSON.parse(obj1);
 			console.log(obj[hostPic]);
-			
+			var tempPlayer = games[gameId]["players"];
+			console.log(tempPlayer);
+			for(var i =0; i < tempPlayer.length;i++){
+				var tempPlayer = tempPlayer[i]["connection"] = null;
+			}
+			console.log(tempPlayer);
 			var syncData = {
 				action:"syncGame",
 				playerSlots:playerSlots,
 				playerData:slotData,
-				hostData:obj[hostPic]
+				hostData:obj[hostPic],
+				playerDataFull:tempPlayer
 			}
 			console.log(syncData);
 			console.log("This is sync data");
@@ -335,7 +343,11 @@ function syncPlayerSlots(gameId){
 		var players = games[gameId]["players"];
 		var picSyncDataArr = [];
 		for(var i =0; i < players.length; i++){
-			var pic = getPlayerPicId(players[i]["avatar"]["avatarSlotId"]);
+			let questPath = path.join(__dirname, '../questData/players.json');
+			var obj1 = fs.readFileSync(questPath, 'utf8');
+			var obj = JSON.parse(obj1);
+			var pic = obj[players[i]["avatar"]["avatarSlotId"]];
+			
 			var playerId = players[i]["playerId"];
 			var picSyncData = {
 				playerId:playerId,
@@ -348,6 +360,26 @@ function syncPlayerSlots(gameId){
 	})
 }
 
+function lockCharacter(data){
+	searchGamesById(data.gameId).then((gameId) => {
+		searchPlayerId(data.playerId,gameId).then((playerData) =>{
+			games[gameId]["players"][playerData]["avatar"]["locked"] = true;
+			var slotId = games[gameId]["players"][playerData]["avatar"]["avatarSlotId"];
+			let questPath = path.join(__dirname, '../questData/players.json');
+			var obj1 = fs.readFileSync(questPath, 'utf8');
+			var obj = JSON.parse(obj1);
+			var pic = obj[slotId];
+			var brodData = {
+				action:"lockedCharacter",
+				playerId:data.playerId,
+				pictureId:pic,
+				playersPicId:games[gameId]["playerSlots"]
+			}
+			massSend(data.gameId,brodData,gameId);
+		});
+	});
+}
+exports.lockCharacter = lockCharacter;
 exports.createGame = createGame;
 exports.searchGamesById = searchGamesById;
 exports.addPlayer = addPlayer;

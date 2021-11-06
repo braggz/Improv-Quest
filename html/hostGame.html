@@ -76,7 +76,7 @@
 			addPlayerPicSlot(parsed.playerPicSlots);
 		}
 		else if(parsed.action == "updatePicture"){
-			updatePicture(parsed.playersPicId,parsed.pictureId,parsed.playerId);
+			updatePicture(parsed.playersPicId,parsed.pictureId.picId,parsed.playerId);
 		}
 		else if(parsed.action == "updateQuest"){
 			updateQuest(parsed.pictureId);

@@ -25,6 +25,7 @@ var con= mysql.createPool({
 				avatar:{
 					avatarSlotId:0,
 					avatarPicId:null,
+					locked:false
 				},
 				gameId:gameId,
 				playerId:playerId,
