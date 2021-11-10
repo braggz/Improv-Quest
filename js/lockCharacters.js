@@ -57,4 +57,36 @@ function searchLockedSlots(gameId,picId){
 	});
 }
 
+function unlockCharacter(data){
+  var games = getGames.getGames();
+//  console.log(data);
+	searchGamesById.searchGamesById(data.gameId).then((gameId) => {
+		searchPlayerId.searchPlayerId(data.playerId,gameId).then((playerData) =>{
+
+      var picSlot = games[gameId]["players"][playerData]["avatar"]["avatarSlotId"];
+      var saveData = data;
+       searchLockedSlots(gameId,picSlot).then((lockData)=>{
+
+         if(lockData){
+           games[gameId]["players"][playerData]["avatar"]["locked"] = false;
+
+    			var slotId = games[gameId]["players"][playerData]["avatar"]["avatarSlotId"];
+    			let questPath = path.join(__dirname, '../questData/players.json');
+    			var obj1 = fs.readFileSync(questPath, 'utf8');
+    			var obj = JSON.parse(obj1);
+    			var pic = obj[slotId];
+    			var brodData = {
+    				action:"unlockedCharacter",
+    				playerId:saveData.playerId,
+    				pictureId:pic,
+    				playersPicId:games[gameId]["playerSlots"]
+    			}
+    			massSend.massSend(saveData.gameId,brodData,gameId);
+        }
+      });
+		});
+	});
+}
+
 exports.lockCharacter = lockCharacter;
+exports.unlockCharacter = unlockCharacter;

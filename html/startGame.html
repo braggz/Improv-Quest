@@ -42,6 +42,7 @@
 	var intervalId;
 	var count = 0;
 	var buttonDiv;
+  var locked = false;
 	var picId;
 	var divId;
 	const ws = new WebSocket('ws://localhost:9898/');
@@ -73,7 +74,7 @@
 		if(data.action == "joinedGame"){
 			count+=1;
 			document.getElementById("playersJoined").innerHTML = "Players Joined: " + data.playerCount + "/4";
-			addPlayerPicSlot(data.playerPicSlots);
+			addPlayerPicSlot(data.playerPicSlots,data);
 
 		}
 		else if(data.action == "error"){
@@ -97,48 +98,56 @@
 		else if(data.action == "lockedCharacter"){
 			lockedCharacter(data);
 		}
+    else if(data.action == "unlockedCharacter"){
+			unlockedCharacter(data);
+		}
     else if(data.action == "characterIsLocked"){
       alert("That character has been chosen. Please choose another.")
     }
 	}
-function addPlayerPicSlot(val){
+function addPlayerPicSlot(val,data){
+
 	for(var key in val){
 		if(val[key] != null){
-			if(key == "playerOneSlotId"){
+			if(key == "playerOneSlotId" && !locked){
 			console.log("here");
 				document.getElementById("playerOneSlot").style.display = "block";
 				if(val[key] == playerId){
 					picId = "playerOnePic";
 					divId = "playerOneSlot";
 					buttonDiv = "butDivOne";
+          locked = true;
 					addPlayerButtons();
 				}
 			}
 			else if(key == "playerTwoSlotId"){
 				document.getElementById("playerTwoSlot").style.display = "block";
-				if(val[key] == playerId){
+				if(val[key] == playerId && !locked){
 					picId = "playerTwoPic";
 					divId = "playerTwoSlot";
 					buttonDiv = "butDivTwo";
+          locked = true;
 					addPlayerButtons();
 				}
 			}
-			else if(key == "playerThreeSlotId"){
+			else if(key == "playerThreeSlotId" ){
 				document.getElementById("playerThreeSlot").style.display = "block";
-				if(val[key] == playerId){
+				if(val[key] == playerId && !locked){
 					picId = "playerThreePic";
 					divId = "playerThreeSlot";
 					buttonDiv = "butDivThree";
+          locked = true;
 					addPlayerButtons();
 
 				}
 			}
-			else if(key == "playerFourSlotId"){
+			else if(key == "playerFourSlotId" ){
 				document.getElementById("playerFourSlot").style.display = "block";
-				if(val[key] == playerId){
+				if(val[key] == playerId && !locked){
 					picId = "playerFourPic";
 					divId = "playerFourSlot";
 					buttonDiv = "butDivFour";
+          locked = true;
 					addPlayerButtons();
 				}
 			}
@@ -151,9 +160,9 @@ function addPlayerPicSlot(val){
 
 	var html ="";
 
-	html += "<button value='"+playerId+"' onclick='previous(this.value)'>Previous</button>";
-	html += "<button value='"+playerId+"' onclick='next(this.value)'>Next</button>";
-	html += "<button value='"+playerId+"' onclick='lockCharacter(this.value)'>Choose Character</button>";
+	html += "<button id='prev"+playerId+"' value='"+playerId+"' onclick='previous(this.value)'>Previous</button>";
+	html += "<button id='next"+playerId+"' value='"+playerId+"' onclick='next(this.value)'>Next</button>";
+	html += "<button id='lock"+playerId+"' value='"+playerId+"' onclick='lockCharacter(this.value)'>Lock</button>";
 	document.getElementById(buttonDiv).innerHTML = html;
 
 }
@@ -234,6 +243,37 @@ function lockedCharacter(data){
 	console.log(data);
 	//updatePicture(val,id,playerId)
 	updatePicture(data.playersPicId,data.pictureId.lockedPicId,data.playerId);
+  if(data.playerId == playerId){
+
+    document.getElementById("prev"+playerId).style.display = "none";
+    document.getElementById("next"+playerId).style.display = "none";
+
+    document.getElementById("lock"+playerId).setAttribute('onclick','unlock(this.value)')
+    document.getElementById("lock"+playerId).innerHTML = "Unlock";
+
+  }
+}
+function unlockedCharacter(data){
+	updatePicture(data.playersPicId,data.pictureId.picId,data.playerId);
+
+  if(data.playerId == playerId){
+
+    document.getElementById("prev"+playerId).style.display = "";
+    document.getElementById("next"+playerId).style.display = "";
+
+    document.getElementById("lock"+playerId).setAttribute('onclick','lockCharacter(this.value)')
+    document.getElementById("lock"+playerId).innerHTML = "Lock";
+
+  }
+}
+
+function unlock(val){
+  var data = {
+		action:"unlockCharacter",
+		playerId:playerId,
+		gameId:gameId
+	}
+	ws.send(JSON.stringify(data));
 }
 
 </script>

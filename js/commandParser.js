@@ -78,6 +78,9 @@ function commandParser(data,connection){
 	else if(parsedData.action == "lockCharacter"){
 		lockCharacter.lockCharacter(parsedData);
 	}
+  else if(parsedData.action == "unlockCharacter"){
+		lockCharacter.unlockCharacter(parsedData);
+	}
 }
 
 
