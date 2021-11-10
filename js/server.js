@@ -5,7 +5,7 @@ var path = require('path');
 directHttp = express();
 var express = require('express');
 
-
+var hostDisconnect = require('./hostDisconnected');
 var programPath = path.join(__dirname, '../');
 var htmlRoot = programPath + "/html";
 var dir = path.join(__dirname, '../');
@@ -55,6 +55,11 @@ wsServer.on('request', function(request) {
 	  commandParser.commandParser(message.utf8Data,connection);
     });
     connection.on('close', function(reasonCode, description) {
+		console.log(connection);
         console.log('Client has disconnected.');
+		
+		if(connection.isHost){
+			hostDisconnect.hostDisconnect(connection);
+		}
     });
 });

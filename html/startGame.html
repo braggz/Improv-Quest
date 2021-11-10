@@ -80,6 +80,9 @@
 		else if(data.action == "error"){
 			window.location.href = "http://localhost/playGame?error="+data.value;
 		}
+		else if(data.action == "hostDisconnect"){
+			window.location.href = "http://localhost/playGame?error=Host disconnected, please rejoin.";
+		}
 		else if(data.action == "ierror"){
 			document.getElementById("error").innerHTML = data.message;
 		}

@@ -5,7 +5,7 @@ var searchPlayerId = require("./searchGamesById.js");
 var path = require('path');
 var fs = require('fs');
 
-function massSend(gameId,data,index){
+function massSend(data,index){
   var games = getGames.getGames();
 	for(var i =0; i < games[index]["connections"].length;i++){
 		//console.log("fuck")

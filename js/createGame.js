@@ -31,6 +31,8 @@
 					activePlayers:0,
 					connections:connections,
 					selectedQuest:0,
+					locked:false,
+					gamePassword:null,
 					host:{
 						avatart:"test"
 					},
@@ -42,9 +44,11 @@
 					},
 				}
 			//	//console.log(game);
-
+				connection.gameId = gameId;
+				connection.isHost = true;
 				games.push(game);
 			//	//console.log(games);
+				//console.log(connection);
 				resolve(game);
 
 		//});
