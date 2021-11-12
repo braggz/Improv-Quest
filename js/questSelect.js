@@ -32,7 +32,8 @@ function nextQuest(json){
 				pictureId:picId,
 			}
 			//console.log(data);
-			massSend.massSend(json.gameId,data,searchData);
+			
+			massSend.massSend(data,searchData);
 
 	})
 	})
@@ -64,7 +65,7 @@ function previousQuest(json){
 				pictureId:picId,
 			}
 			//console.log(data);
-			massSend.massSend(json.gameId,data,searchData);
+			massSend.massSend(data,searchData);
 
 	})
 	})

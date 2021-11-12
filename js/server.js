@@ -4,8 +4,9 @@ var express = require('express');
 var path = require('path');
 directHttp = express();
 var express = require('express');
-
+ var massSend = require("./massSend.js");
 var hostDisconnect = require('./hostDisconnected');
+var searchGamesById = require("./searchGamesById.js");
 var programPath = path.join(__dirname, '../');
 var htmlRoot = programPath + "/html";
 var dir = path.join(__dirname, '../');
@@ -55,11 +56,29 @@ wsServer.on('request', function(request) {
 	  commandParser.commandParser(message.utf8Data,connection);
     });
     connection.on('close', function(reasonCode, description) {
-		console.log(connection);
+	//	console.log(connection);
         console.log('Client has disconnected.');
-		
-		if(connection.isHost){
+		console.log(connection.isPlayer);
+		if(connection.isHost && connection.isHost != undefined && connection.isHost != null){
 			hostDisconnect.hostDisconnect(connection);
+		}
+		else if(connection.isPlayer && connection.isPlayer != undefined && connection.isPlayer != null){
+			console.log("player disconnected")
+			playerDisconnected(connection);
 		}
     });
 });
+
+function playerDisconnected(con){
+	var gameId = con.gameId;
+	var playerId = con.playerId;
+	searchGamesById.searchGamesById(gameId).then((searchRes) =>{
+		var data = {
+			action:"playerLeft",
+			playerId:playerId
+		}
+		massSend.massSend(data,searchRes);
+		
+	});
+	
+}

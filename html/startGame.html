@@ -158,6 +158,56 @@ function addPlayerPicSlot(val,data){
 
 	}
 }
+function removePlayerPicSlot(val,data,playerId){
+
+	for(var key in val){
+		if(val[key] != null){
+			if(key == "playerOneSlotId" && !locked){
+			console.log("here");
+				document.getElementById("playerOneSlot").style.display = "block";
+				if(val[key] == playerId){
+					picId = "playerOnePic";
+					divId = "playerOneSlot";
+					buttonDiv = "butDivOne";
+         
+				
+				}
+			}
+			else if(key == "playerTwoSlotId"){
+				document.getElementById("playerTwoSlot").style.display = "block";
+				if(val[key] == playerId && !locked){
+					picId = "playerTwoPic";
+					divId = "playerTwoSlot";
+					buttonDiv = "butDivTwo";
+          locked = true;
+					addPlayerButtons();
+				}
+			}
+			else if(key == "playerThreeSlotId" ){
+				document.getElementById("playerThreeSlot").style.display = "block";
+				if(val[key] == playerId && !locked){
+					picId = "playerThreePic";
+					divId = "playerThreeSlot";
+					buttonDiv = "butDivThree";
+          locked = true;
+					addPlayerButtons();
+
+				}
+			}
+			else if(key == "playerFourSlotId" ){
+				document.getElementById("playerFourSlot").style.display = "block";
+				if(val[key] == playerId && !locked){
+					picId = "playerFourPic";
+					divId = "playerFourSlot";
+					buttonDiv = "butDivFour";
+          locked = true;
+					addPlayerButtons();
+				}
+			}
+		}
+
+	}
+}
 
  function addPlayerButtons(){
 
@@ -278,5 +328,7 @@ function unlock(val){
 	}
 	ws.send(JSON.stringify(data));
 }
+
+
 
 </script>

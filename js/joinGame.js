@@ -4,14 +4,19 @@
 var searchGamesById = require("./searchGamesById.js");
 var searchPlayerId = require("./searchGamesById.js");
 var addPlayer = require("./playerJoined.js");
+var getGames = require("./createGame.js");
 
  async function joinGame(gameId,connection){
 	return new Promise(resolve => {
 		searchGamesById.searchGamesById(gameId).then((searchRes) =>{
-			console.log(gameId);
+			var games = getGames.getGames();
+			var gameId = games[searchRes]["id"];
 			var playerId = uuid.v4();
+			connection.playerId = playerId;
+			connection.isPlayer = true;
+			connection.gameId = gameId;
 			assignId(playerId,connection);
-
+		console.log("Set id");
 
 			var player = {
 				name:"name",
