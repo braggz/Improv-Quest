@@ -40,9 +40,9 @@ function commandParser(data,connection){
 		})
 	}
 	else if(parsedData.action == "joinGame"){
-		console.log(parsedData);
+	//	console.log(parsedData);
 		joinGame.joinGame(parsedData.gameId,connection).then((joinRes) => {
-			console.log(joinRes.playerPicSlots);
+		//	console.log(joinRes.playerPicSlots);
 			if(joinRes.action != "error"){
 				var data = {
 				action:"joinedGame",
@@ -50,7 +50,7 @@ function commandParser(data,connection){
 				playerCount:joinRes.players,
 				playerPicSlots:joinRes.playerPicSlots
 				}
-				console.log(JSON.stringifydata);
+			//	console.log(JSON.stringifydata);
 				connection.sendUTF(JSON.stringify(data));
 			}
 			else{

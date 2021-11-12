@@ -70,7 +70,7 @@
 
 
 	function parseResponse(data){
-	console.log(data);
+console.log(data);
 		if(data.action == "joinedGame"){
 			count+=1;
 			document.getElementById("playersJoined").innerHTML = "Players Joined: " + data.playerCount + "/4";
@@ -107,15 +107,21 @@
     else if(data.action == "characterIsLocked"){
       alert("That character has been chosen. Please choose another.")
     }
+    if(data.action == "playerLeft"){
+			count-=1;
+			//document.getElementById("playersJoined").innerHTML = "Players Joined: " + data.playerCount + "/4";
+
+       removePlayerPicSlot(data);
+		}
 	}
 function addPlayerPicSlot(val,data){
 
 	for(var key in val){
 		if(val[key] != null){
-			if(key == "playerOneSlotId" && !locked){
+			if(key == "playerOneSlotId" ){
 			console.log("here");
 				document.getElementById("playerOneSlot").style.display = "block";
-				if(val[key] == playerId){
+				if(val[key] == playerId && !locked){
 					picId = "playerOnePic";
 					divId = "playerOneSlot";
 					buttonDiv = "butDivOne";
@@ -158,55 +164,29 @@ function addPlayerPicSlot(val,data){
 
 	}
 }
-function removePlayerPicSlot(val,data,playerId){
-
-	for(var key in val){
-		if(val[key] != null){
-			if(key == "playerOneSlotId" && !locked){
-			console.log("here");
-				document.getElementById("playerOneSlot").style.display = "block";
-				if(val[key] == playerId){
-					picId = "playerOnePic";
-					divId = "playerOneSlot";
-					buttonDiv = "butDivOne";
-         
-				
-				}
+function removePlayerPicSlot(data){
+  var val = data.playerPicSlots;
+  for(var key in val){
+		if(val[key] == null){
+      if(key == "playerOneSlotId" ){
+			  document.getElementById("playerOnePic").src = "/img/" + data.resetSlotData.picId;
+				document.getElementById("playerOneSlot").style.display = "none";
 			}
 			else if(key == "playerTwoSlotId"){
-				document.getElementById("playerTwoSlot").style.display = "block";
-				if(val[key] == playerId && !locked){
-					picId = "playerTwoPic";
-					divId = "playerTwoSlot";
-					buttonDiv = "butDivTwo";
-          locked = true;
-					addPlayerButtons();
-				}
+        document.getElementById("playerTwoPic").src = "/img/" + data.resetSlotData.picId;
+				document.getElementById("playerTwoSlot").style.display = "none";
 			}
 			else if(key == "playerThreeSlotId" ){
-				document.getElementById("playerThreeSlot").style.display = "block";
-				if(val[key] == playerId && !locked){
-					picId = "playerThreePic";
-					divId = "playerThreeSlot";
-					buttonDiv = "butDivThree";
-          locked = true;
-					addPlayerButtons();
-
-				}
+        document.getElementById("playerThreePic").src = "/img/" + data.resetSlotData.picId;
+				document.getElementById("playerThreeSlot").style.display = "none";
 			}
 			else if(key == "playerFourSlotId" ){
-				document.getElementById("playerFourSlot").style.display = "block";
-				if(val[key] == playerId && !locked){
-					picId = "playerFourPic";
-					divId = "playerFourSlot";
-					buttonDiv = "butDivFour";
-          locked = true;
-					addPlayerButtons();
-				}
+        document.getElementById("playerFourPic").src = "/img/" + data.resetSlotData.picId;
+				document.getElementById("playerFourSlot").style.display = "none";
 			}
-		}
+    }
+  }
 
-	}
 }
 
  function addPlayerButtons(){
@@ -262,7 +242,7 @@ function updatePicture(val,id,playerId){
 	}
 }
 function updateQuest(updateData){
-	console.log(updateData);
+	//console.log(updateData);
 	console.log("This is data")
 	document.getElementById("hostPic").src = "/img/"+updateData.picId;
 	document.getElementById("questTitle").innerHTML=updateData.title;
@@ -293,7 +273,7 @@ function lockCharacter(val){
 }
 
 function lockedCharacter(data){
-	console.log(data);
+	//console.log(data);
 	//updatePicture(val,id,playerId)
 	updatePicture(data.playersPicId,data.pictureId.lockedPicId,data.playerId);
   if(data.playerId == playerId){

@@ -33,7 +33,7 @@ function nextPicture(json,con){
 					playersPicId:games[searchData]["playerSlots"]
 				}
 			//	//console.log(data);
-				massSend.massSend(json.gameId,data,searchData);
+				massSend.massSend(data,searchData);
 			}
 			else{
 				var data = {
@@ -79,7 +79,7 @@ function previousPicture(json,con){
 
 				}
 				//console.log(data);
-				massSend.massSend(json.gameId,data,searchData);
+				massSend.massSend(data,searchData);
 			}
 			else{
 				var data = {

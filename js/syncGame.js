@@ -23,7 +23,7 @@ async function syncGame(gameId,con){
 	//		//console.log(obj[hostPic]);
 
 			var tempPlayer = games[gameId]["players"];
-			console.log(games[gameId]["players"]);
+		//	console.log(games[gameId]["players"]);
       console.log("before null")
       var copy = [];
 			for(var i =0; i < tempPlayer.length;i++){
@@ -45,7 +45,7 @@ async function syncGame(gameId,con){
 				hostData:obj[hostPic],
 				playerDataFull:copy
 			}
-      console.log(games[gameId]["players"]);
+      //console.log(games[gameId]["players"]);
       console.log("after null")
 		//	//console.log(syncData);
 		//	//console.log("This is sync data");

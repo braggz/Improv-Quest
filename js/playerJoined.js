@@ -61,19 +61,31 @@ var games = getGames.getGames();
 
 function pickPicSlot(index,playerId,player){
   var games = getGames.getGames();
-	var slotNum = (games[index].players.length)
+	var slots = (games[index].playerSlots);
+	console.log(games[index].playerSlots);
+	console.log("slots before");
 
-	if(slotNum == 1){
-		games[index].playerSlots.playerOneSlotId = playerId;
+	for(key in slots){
+		if(slots[key] == null){
+			console.log("inside loop");
+			games[index]["playerSlots"][key] = playerId;
+			break;
+		}
 	}
-	else if(slotNum == 2){
-		games[index].playerSlots.playerTwoSlotId = playerId;
-	}
-	else if(slotNum == 3){
-		games[index].playerSlots.playerThreeSlotId = playerId;
-	}
-	else if(slotNum == 4){
-		games[index].playerSlots.playerFourSlotId = playerId;
-	}
+	console.log(games[index].playerSlots);
+	console.log("slots after");
+
+	// if(slotNum == 1){
+	// 	games[index].playerSlots.playerOneSlotId = playerId;
+	// }
+	// else if(slotNum == 2){
+	// 	games[index].playerSlots.playerTwoSlotId = playerId;
+	// }
+	// else if(slotNum == 3){
+	// 	games[index].playerSlots.playerThreeSlotId = playerId;
+	// }
+	// else if(slotNum == 4){
+	// 	games[index].playerSlots.playerFourSlotId = playerId;
+	// }
 }
 exports.addPlayer = addPlayer;

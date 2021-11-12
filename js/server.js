@@ -9,15 +9,16 @@ var hostDisconnect = require('./hostDisconnected');
 var searchGamesById = require("./searchGamesById.js");
 var programPath = path.join(__dirname, '../');
 var htmlRoot = programPath + "/html";
+var getGames = require("./createGame.js");
 var dir = path.join(__dirname, '../');
-
+var fs = require('fs');
 directHttp.use(express.static(dir));
 
 
 var dir = path.join(__dirname, '../i');
 
 
-console.log(dir);
+//console.log(dir);
 const http = require('http');
 const WebSocketServer = require('websocket').server;
 
@@ -58,7 +59,7 @@ wsServer.on('request', function(request) {
     connection.on('close', function(reasonCode, description) {
 	//	console.log(connection);
         console.log('Client has disconnected.');
-		console.log(connection.isPlayer);
+	//	console.log(connection.isPlayer);
 		if(connection.isHost && connection.isHost != undefined && connection.isHost != null){
 			hostDisconnect.hostDisconnect(connection);
 		}
@@ -70,15 +71,43 @@ wsServer.on('request', function(request) {
 });
 
 function playerDisconnected(con){
+  var games = getGames.getGames();
 	var gameId = con.gameId;
 	var playerId = con.playerId;
 	searchGamesById.searchGamesById(gameId).then((searchRes) =>{
+
+    var slots =  games[searchRes]["playerSlots"];
+    for(var key in slots){
+      if(slots[key] == playerId){
+        games[searchRes]["playerSlots"][key] = null;
+      }
+    }
+
+
+    var tempArr = [];
+    for(var i =0; i < games[searchRes]["players"].length ; i++){
+      if(games[searchRes]["players"][i]["playerId"] == playerId){
+        //
+      }
+      else{
+        tempArr.push(games[searchRes]["players"][i]);
+      }
+    }
+    games[searchRes]["players"] = tempArr;
+    games[searchRes]["activePlayers"] -=1
+    let questPath = path.join(__dirname, '../questData/players.json');
+    var obj1 = fs.readFileSync(questPath, 'utf8');
+    var obj = JSON.parse(obj1);
+
 		var data = {
 			action:"playerLeft",
-			playerId:playerId
+      value:playerId,
+      playerCount:games[searchRes]["players"].length,
+      playerPicSlots:games[searchRes]["playerSlots"],
+      resetSlotData:obj[0]
 		}
 		massSend.massSend(data,searchRes);
-		
+
 	});
-	
+
 }
