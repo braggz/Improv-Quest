@@ -29,7 +29,7 @@ function lockCharacter(data){
     				pictureId:pic,
     				playersPicId:games[gameId]["playerSlots"]
     			}
-    			massSend.massSend(saveData.gameId,brodData,gameId);
+    			massSend.massSend(brodData,gameId);
         }
         else{
           var con = games[gameId]["players"][playerData]["connection"];
@@ -81,7 +81,7 @@ function unlockCharacter(data){
     				pictureId:pic,
     				playersPicId:games[gameId]["playerSlots"]
     			}
-    			massSend.massSend(saveData.gameId,brodData,gameId);
+    			massSend.massSend(brodData,gameId);
         }
       });
 		});
